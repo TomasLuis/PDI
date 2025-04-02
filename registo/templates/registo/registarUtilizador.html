@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Conta</title>
+    <link rel="stylesheet" href="{% static 'css/registarUtilizador.css' %}">
+</head>
+<body class="bg-gray-100 flex justify-center items-center min-h-screen">
+    
+    <!-- Navbar -->
+    <div class="navbar">
+        <img src="{% static 'imagens/logo.png' %}" alt="SkillCraft Logo" class="logo">
+    </div>
+
+    <!-- Formulário -->
+    <div class="form-container">
+        <h2 class="form-title">Criar Conta</h2>
+        <hr class="divider">
+
+        <form method="post" class="form">
+            {% csrf_token %}
+
+            <div class="input-group">
+                <label class="label" for="email">Email</label>
+                <input type="email" id="email" name="email" class="input-field">
+            </div>
+
+            <div class="input-group">
+                <label class="label" for="password1">Palavra-Passe</label>
+                <input type="password" id="password1" name="password1" class="input-field">
+            </div>
+
+            <div class="input-group">
+                <label class="label" for="password2">Confirmar Palavra-Passe</label>
+                <input type="password" id="password2" name="password2" class="input-field">
+            </div>
+
+            <button type="submit" class="submit-btn">Confirmar</button>
+        </form>        
+    </div>
+
+</body>
+</html>

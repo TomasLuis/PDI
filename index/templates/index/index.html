@@ -1,0 +1,222 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillCraft</title>
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <style>
+        /* CSS inline para o ícone de perfil e menu suspenso */
+        .profile-icon {
+            width: 35px;
+            height: 35px;
+            vertical-align: middle;
+            cursor: pointer;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 160px;
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+            z-index: 1;
+            right: 0;
+            top: 100%; /* Posiciona o menu abaixo do ícone */
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .dropdown-content a, .dropdown-content button {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        .dropdown-content a:hover, .dropdown-content button:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{% static 'imagens/logo.png' %}" alt="SkillCraft">
+        </div>
+        <nav>
+            <ul>
+                {% if user and user.is_authenticated %}
+                    <li class="profile-dropdown">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="profile-icon">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22C7.9 14.43 9.8 13 12 13c2.2 0 4.1 1.43 5.98 3.98-1.29 1.94-3.5 3.22-6 3.22z"/>
+                        </svg>
+                        <div class="dropdown-content">
+                            <a href="/perfil/">Ver Perfil</a>
+                            <a href="/registo/registarUtilizador/">Chat</a>
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button type="submit">Sair</button>
+                            </form>
+                        </div>
+                    </li>
+                {% else %}
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Transforme projetos em Realidade</h1>
+            <div class="search-bar">
+                <form method="GET" action="">
+                    <input type="text" name="q" value="{{ query }}" placeholder="Pesquisar especialistas...">
+                    <button type="submit">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <section class="especialistas">
+            <button class="prev">◁</button>
+            <div class="cards-container">
+                <div class="cards">
+                    {% for especialista in especialistas %}
+                        <div class="card">
+                            <div class="card-image">
+                                <img src="{{ especialista.imagem.url }}" alt="{{ especialista.nome }}">
+                                <div class="badge">Recomendado</div>
+                            </div>
+                            <div class="card-content">
+                                <h3>{{ especialista.nome }}</h3>
+                                <p class="description">{{ especialista.descricao }}</p>
+                                <p class="category">{{ especialista.categoria }}</p>
+                                <div class="rating">
+                                    <span>★ {{ especialista.classificacao }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <button class="next">▷</button>
+        </section>
+
+        <section class="info">
+            <h2>Como funcionamos?</h2>
+            <p>Na SkillCraft poderás encontrar diversos especialistas para serviços manuais que precisas. Oferecemos diversos ramos das áreas e escolhe o que mais se adequa à tua necessidade.</p>
+        </section>
+
+        <section class="info">
+            <h2>Rápida Negociação</h2>
+            <p>Comunique-se com os especialistas de forma fácil e rápida através do nosso Chat integrado, tendo assim, uma melhor forma de comunicação.</p>
+        </section>
+
+        <section class="info">
+            <h2>Deixe sua Opinião</h2>
+            <p>Poderás deixar sua avaliação do serviço contratado, consegiuindo assim escrever um comentário e avaliá-lo com uma nota. Desta forma, ajudas a melhorar o nosso site e os especialistas com feedbacks.</p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="{% static 'imagens/slogan.png' %}">
+            </div>
+            <div class="footer-links">
+                <a href="#">Quem somos?</a>
+                <a href="#">Página inicial</a>
+            </div>
+            <div class="copyright">
+                <p>© SkillCraft</p>
+                <p>Portugal, Coimbra, Quinta Agrícola, Bencanta, 3045-601</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const profileIcon = document.querySelector(".profile-icon");
+            const dropdownContent = document.querySelector(".dropdown-content");
+
+            profileIcon.addEventListener("click", function () {
+                if (dropdownContent.style.display === "block") {
+                    dropdownContent.style.display = "none";
+                } else {
+                    dropdownContent.style.display = "block";
+                }
+            });
+
+            const prevButton = document.querySelector(".prev");
+            const nextButton = document.querySelector(".next");
+            const cardsContainer = document.querySelector(".cards");
+            let cards = document.querySelectorAll(".card");
+            const totalCards = cards.length;
+            const cardWidth = 420;
+            const cardsPerView = 2;
+
+            const cloneCount = cardsPerView;
+            for (let i = 0; i < cloneCount; i++) {
+                const firstClone = cards[i].cloneNode(true);
+                const lastClone = cards[totalCards - 1 - i].cloneNode(true);
+                cardsContainer.appendChild(firstClone);
+                cardsContainer.insertBefore(lastClone, cards[0]);
+            }
+
+            cards = document.querySelectorAll(".card");
+            const totalClonedCards = cards.length;
+
+            let currentIndex = cloneCount;
+
+            function updateCarousel(transition = true) {
+                if (!transition) {
+                    cardsContainer.style.transition = "none";
+                } else {
+                    cardsContainer.style.transition = "transform 0.3s ease-in-out";
+                }
+                const offset = -currentIndex * cardWidth;
+                cardsContainer.style.transform = `translateX(${offset}px)`;
+            }
+
+            nextButton.addEventListener("click", function () {
+                currentIndex++;
+                updateCarousel();
+
+                if (currentIndex >= totalCards + cloneCount) {
+                    setTimeout(() => {
+                        currentIndex = cloneCount;
+                        updateCarousel(false);
+                    }, 300);
+                }
+            });
+
+            prevButton.addEventListener("click", function () {
+                currentIndex--;
+                updateCarousel();
+
+                if (currentIndex < cloneCount) {
+                    setTimeout(() => {
+                        currentIndex = totalCards + cloneCount - 1;
+                        updateCarousel(false);
+                    }, 300);
+                }
+            });
+
+            updateCarousel(false);
+        });
+    </script>
+</body>
+</html>
