@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Alterar Passe</title>
+    <link rel="stylesheet" href="{% static 'css/nova_passe.css' %}">
+</head>
+<body>
+    <div class="navbar">
+        <a href="{% url 'login' %}">
+            <img src="{% static 'imagens/logo.png' %}" alt="Logo">
+        </a>
+    </div>
+    <div class="container">
+        <div class="card">
+            <div class="card-content">
+                <h1>Alterar Palavra Passe</h1>
+                {% if erro %}
+                    <p class="error">{{ erro }}</p>
+                {% endif %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <label for="nova_passe">Nova Passe</label>
+                        <input type="password" name="nova_passe" id="nova_passe" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="confirmar_passe">Confirmar Passe:</label>
+                        <input type="password" name="confirmar_passe" id="confirmar_passe" required>
+                    </div>
+                    <button type="submit">Atualizar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
