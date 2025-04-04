@@ -25,8 +25,10 @@
             top: 0;
             left: 0;
         }
-        .navbar img {
-            height: 50px;
+        .logo {
+            display: block;
+            margin: 0 auto;
+            height: 3.5rem;
         }
         .container {
             text-align: center;
@@ -94,7 +96,7 @@
 </head>
 <body>
     <div class="navbar">
-        <img src="{% static 'imagens/logo.png' %}" alt="Logo">
+        <img src="{% static 'imagens/logo.png' %}" alt="Logo" class="logo">
     </div>
     <div class="container">
         <h2>Login</h2>
@@ -106,7 +108,7 @@
             <button type="submit" class="confirmar">Confirmar</button>
         </form>
         <a href="{% url 'recuperar_senha_email' %}" class="forgot-password">Esqueceste-te da palavra-passe?</a>
-        <a href="#" class="create-account">Criar conta.</a>
+        <a href="{% url 'registar' %}" class="create-account">Criar conta.</a>
     </div>
 </body>
 </html>

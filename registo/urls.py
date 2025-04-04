@@ -2,5 +2,5 @@ from django.urls import path
 from .views import register
 
 urlpatterns = [
-    path("registarUtilizador/", register, name="register"),
+    path("registarUtilizador/", register, name="registar"),
 ]
