@@ -20,6 +20,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views # Importe as views de autenticação
 from perfil import views
+import os
+from django.views.static import serve
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,6 +35,8 @@ urlpatterns = [
     path('adicionar_servico/', views.adicionar_servico, name='adicionar_servico'),
     path('editar_servico/<int:pk>/', views.editar_servico, name='editar_servico'),
     path('atualizar_foto_perfil/', views.atualizar_foto_perfil, name='atualizar_foto_perfil'), # Adicione esta linha
+    path('quem_somos/', serve, {'path': 'quem_somos/quem_somos.html', 'document_root': os.path.join(settings.BASE_DIR, 'quem_somos', 'static')}),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
