@@ -23,7 +23,7 @@ class Servico(models.Model):
     prestador = models.ForeignKey(User, on_delete=models.CASCADE, related_name='servicos_prestados')
 
     def __str__(self):
-        return self.nome
+        return self.categoria
 
 class Classificacao(models.Model):
     servico = models.ForeignKey(Servico, on_delete=models.CASCADE, related_name='classificacoes')

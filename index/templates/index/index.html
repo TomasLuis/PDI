@@ -7,7 +7,82 @@
     <title>SkillCraft</title>
     <link rel="stylesheet" href="{% static 'css/index.css' %}">
     <style>
-        /* CSS inline para o ícone de perfil e menu suspenso */
+        /* CSS inline atualizado para centralizar a barra de pesquisa e estilizar a lupa */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .search-bar {
+            position: relative;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .search-bar form {
+            display: flex;
+            width: 100%;
+        }
+
+        #search-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px 0 0 5px;
+            font-size: 16px;
+            outline: none; /* Remove a borda de foco padrão */
+        }
+
+        .search-bar button {
+            padding: 10px 15px;
+            background-color: #a0522d; /* Cor castanha (sienna) - ajuste conforme necessário */
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            outline: none; /* Remove a borda de foco padrão */
+        }
+
+        .search-bar button svg {
+            display: block; /* Garante que o SVG se comporte como um bloco */
+            width: 20px; /* Ajuste o tamanho da lupa */
+            height: 20px;
+            fill: white; /* Cor da lupa */
+        }
+
+        .suggestions {
+            display: none; /* Inicialmente escondido */
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            width: 90%;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    
+        .suggestions li {
+            padding: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    
+        .suggestions li:hover {
+            background-color: #f9f9f9;
+        }
+
+        /* Estilos existentes para o ícone de perfil e dropdown */
         .profile-icon {
             width: 35px;
             height: 35px;
@@ -20,10 +95,10 @@
             position: absolute;
             background-color: white;
             min-width: 160px;
-            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
             z-index: 1;
             right: 0;
-            top: 100%; /* Posiciona o menu abaixo do ícone */
+            top: 100%;
             border-radius: 8px;
             overflow: hidden;
         }
@@ -79,14 +154,16 @@
         <section class="hero">
             <h1>Transforme projetos em Realidade</h1>
             <div class="search-bar">
-                <form method="GET" action="">
-                    <input type="text" name="q" value="{{ query }}" placeholder="Pesquisar especialistas...">
+                <form id="search-form" method="GET" action="/pesquisa/">
+                    <input id="search-input" type="text" name="q" value="{{ query }}" placeholder="Pesquisar especialistas ou serviços..." autocomplete="off">
                     <button type="submit">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                             <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
                         </svg>
                     </button>
                 </form>
+                <ul id="suggestions" class="suggestions">
+                    </ul>
             </div>
         </section>
 
@@ -127,7 +204,7 @@
 
         <section class="info">
             <h2>Deixe sua Opinião</h2>
-            <p>Poderás deixar sua avaliação do serviço contratado, consegiuindo assim escrever um comentário e avaliá-lo com uma nota. Desta forma, ajudas a melhorar o nosso site e os especialistas com feedbacks.</p>
+            <p>Poderás deixar sua avaliação do serviço contratado, conseguindo assim escrever um comentário e avaliá-lo com uma nota. Desta forma, ajudas a melhorar o nosso site e os especialistas com feedbacks.</p>
         </section>
     </main>
 
@@ -137,7 +214,7 @@
                 <img src="{% static 'imagens/slogan.png' %}">
             </div>
             <div class="footer-links">
-                <a href="quem_somos">Quem somos?</a>
+                <a href='quem_somos'>Quem somos?</a>
                 <a href="#">Página inicial</a>
             </div>
             <div class="copyright">
@@ -152,13 +229,11 @@
             const profileIcon = document.querySelector(".profile-icon");
             const dropdownContent = document.querySelector(".dropdown-content");
 
-            profileIcon.addEventListener("click", function () {
-                if (dropdownContent.style.display === "block") {
-                    dropdownContent.style.display = "none";
-                } else {
-                    dropdownContent.style.display = "block";
-                }
-            });
+            if (profileIcon && dropdownContent) {
+                profileIcon.addEventListener("click", function () {
+                    dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
+                });
+            }
 
             const prevButton = document.querySelector(".prev");
             const nextButton = document.querySelector(".next");
@@ -216,7 +291,48 @@
             });
 
             updateCarousel(false);
+
+            const searchInput = document.getElementById("search-input");
+            const suggestionsBox = document.getElementById("suggestions");
+            const searchForm = document.getElementById("search-form"); // Get the form element
+
+            searchInput.addEventListener("input", async function () {
+                const query = searchInput.value.trim();
+                console.log("Termo de pesquisa no frontend:", query);
+
+                if (query.length >= 2) {
+                    try {
+                        const response = await fetch(`/api/sugestoes/servicos/?q=${encodeURIComponent(query)}`);
+                        const suggestions = await response.json();
+                        console.log("Resposta do servidor:", suggestions);
+
+                        suggestionsBox.innerHTML = suggestions
+                            .map(s => `<li>${s.categoria_servico}</li>`)
+                            .join("");
+                        suggestionsBox.style.display = "block";
+                    } catch (error) {
+                        console.error("Erro ao buscar sugestões:", error);
+                    }
+                } else {
+                    suggestionsBox.innerHTML = "";
+                    suggestionsBox.style.display = "none";
+                }
+            });
+
+            suggestionsBox.addEventListener("click", function (e) {
+                if (e.target.tagName === "LI") {
+                    searchInput.value = e.target.textContent;
+                    searchForm.submit();
+                }
+            });
+
+            document.addEventListener("click", function (e) {
+                if (!suggestionsBox.contains(e.target) && e.target !== searchInput) {
+                    suggestionsBox.style.display = "none";
+                }
+            });
         });
     </script>
+    
 </body>
 </html>

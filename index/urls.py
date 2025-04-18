@@ -1,6 +1,8 @@
 from django.urls import path
-from .views import pesquisar_especialistas
+from . import views
 
 urlpatterns = [
-    path('',pesquisar_especialistas , name='index'),
+    path('', views.pesquisar_especialistas, name='index'),
+    path('api/sugestoes/servicos/', views.obter_sugestoes_servicos, name='sugestoes_servicos'),
+    path('pesquisa/', views.resultados_pesquisa, name='resultados_pesquisa'),
 ]
