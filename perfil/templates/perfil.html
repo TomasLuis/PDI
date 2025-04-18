@@ -294,7 +294,10 @@
         <h2>Seus Serviços</h2>
         {% for servico, media_classificacao in servicos_com_classificacao %}
         <div class="servico-item">
+            {% if servico.foto %}
             <img src="{{ servico.foto.url }}" alt="{{ servico.nome }}">
+            {% endif %}
+
             <div>
                 <h3>{{ servico.categoria }}</h3>
                 <p>Descrição: {{ servico.descricao }}</p>
