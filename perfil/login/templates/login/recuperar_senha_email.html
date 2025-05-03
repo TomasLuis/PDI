@@ -1,0 +1,34 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recuperar Senha</title>
+    <link rel="stylesheet" href="{% static 'css/recuperar_senha_email.css' %}">
+</head>
+<style>
+    body {
+        font-family: sans-serif;
+        background-color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+</style>
+<body>
+    <div class="navbar">
+        <a href="{% url 'login' %}">
+            <img src="{% static 'imagens/logo.png' %}" alt="Logo">
+        </a>
+    </div>
+    <div class="container">
+        <h1>Insira o seu email</h1>
+        <form method="post">
+            {% csrf_token %}
+            <input type="email" name="email" id="email" required>
+            <button type="submit">Enviar Código</button>
+        </form>
+    </div>
+</body>
+</html>
