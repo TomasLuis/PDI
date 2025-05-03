@@ -28,7 +28,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('registo/', include('registo.urls')),
     path('login/', include('login.urls')),
-    path('logout/', auth_views.LogoutView.as_view(next_page='index'), name='logout'), # Adicione a URL de logout
+    path('logout/', auth_views.LogoutView.as_view(next_page='index:index'), name='logout'), # Adicione a URL de logout
     path('', include('index.urls')),
     path('perfil/', views.perfil, name='perfil'),
     path('atualizar_perfil/', views.atualizar_perfil, name='atualizar_perfil'),
