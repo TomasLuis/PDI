@@ -1,5 +1,6 @@
 {% load custom_filters %}
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -398,7 +399,20 @@
                 </div>
                 <p>({{ comentarios|length }} avaliações)</p>
             </div>
-            
+
+
+            {# BLOCO ADICIONADO PARA EXIBIR MENSAGENS DO DJANGO #}
+            {% if messages %}
+                <ul class="messages" style="list-style: none; padding: 0;">
+                    {% for message in messages %}
+                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+                            {# Estilo inline simples para que a mensagem de erro apareça a vermelho #}
+                            <p style="color: red;">{{ message }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {# FIM DO BLOCO DE MENSAGENS #}
 
             <form method="post" action="{% url 'index:enviar_comentario' servico.id %}">
                 {% csrf_token %}
@@ -456,7 +470,6 @@
             </div>
         </div>
     </footer>
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const profileDropdown = document.querySelector('.profile-dropdown');

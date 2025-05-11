@@ -2,11 +2,14 @@ from django.shortcuts import render, get_object_or_404, redirect
 from index.models import Especialista, Servico  # Importe o modelo Servico
 from perfil.models import Servico, Comentario  # Importe o model Comentario do perfil
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse  # Importe HttpResponse
-from django.db.models import Q, Avg
+from django.db.models import Q, Avg, Count
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models.functions import Round
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.db import models
+
 
 
 def pesquisar_especialistas(request):
@@ -27,9 +30,16 @@ def obter_sugestoes_servicos(request):
 def resultados_pesquisa(request):
     query = request.GET.get('q', '')
     order_by = request.GET.get('order_by', '')
-    distrito = request.GET.get('distrito', '')  # Alterado de localidade para distrito
+    distrito = request.GET.get('distrito', '')
 
     resultados = Servico.objects.all()
+
+    # CORRIGIDO: Use 'comentarios__classificacao' e 'comentarios'
+    resultados = resultados.annotate(
+        avg_avaliacao=Round(Avg('comentarios__classificacao'), 1), # <-- Corrigido
+        comment_count=Count('comentarios') # <-- Corrigido
+    )
+
 
     if query:
         resultados = resultados.filter(
@@ -38,17 +48,18 @@ def resultados_pesquisa(request):
             Q(informacoes_adicionais__icontains=query)
         )
 
-    if distrito:  # Alterado de localidade para distrito
-        resultados = resultados.filter(distrito=distrito)  # Alterado de localidade para distrito
+    if distrito:
+        resultados = resultados.filter(distrito=distrito)
 
     if order_by == 'melhores_classificados':
-        resultados = resultados.annotate(avg_avaliacao=Round(Avg('avaliacao'), 1)).order_by(
-            '-avg_avaliacao', 'nome')
+        resultados = resultados.order_by('-avg_avaliacao', 'nome')
     elif order_by == 'nome':
         resultados = resultados.order_by('nome')
+    else:
+         resultados = resultados.order_by('nome')
 
-    distritos = Servico.objects.values_list('distrito', flat=True).distinct().order_by(
-        'distrito')  # Alterado de localidade para distrito
+
+    distritos = Servico.objects.values_list('distrito', flat=True).distinct().order_by('distrito')
 
     paginator = Paginator(resultados, 6)
     page = request.GET.get('page')
@@ -67,9 +78,9 @@ def resultados_pesquisa(request):
         'num_paginas': paginator.num_pages,
         'pagina_atual': resultados_pagina.number,
         'range_paginas': range(1, paginator.num_pages + 1),
-        'distritos': distritos,  # Alterado de distritos para distritos
+        'distritos': distritos,
         'order_by': order_by,
-        'distrito_selecionado': distrito,  # Alterado de localidade_selecionada para distrito_selecionado
+        'distrito_selecionado': distrito,
     }
     return render(request, 'index/resultados.html', context)
 
@@ -84,28 +95,34 @@ def detalhes_servico(request, servico_id):
     context = {
         'servico': servico,
         'comentarios': comentarios,
-        'media_classificacao': round(media_classificacao, 1),  # Arredonda para uma casa decimal
+        'media_classificacao': round(media_classificacao, 1),
     }
     return render(request, 'index/detalhes_servico.html', context)
 
 
-@login_required
 def enviar_comentario(request, servico_id):
+
     servico = get_object_or_404(Servico, pk=servico_id)
     if request.method == 'POST':
-        comentario_texto = request.POST.get('comentario')
-        classificacao = request.POST.get('classificacao')  # Captura a classificação do formulário
 
-        nome_utilizador = request.user.username
+        if request.user.is_authenticated:
+            comentario_texto = request.POST.get('comentario')
+            classificacao = request.POST.get('classificacao')
 
-        # Cria o comentário com a classificação
-        comentario = Comentario(
-            servico=servico,
-            nome_utilizador=nome_utilizador,
-            comentario=comentario_texto,
-            classificacao=classificacao
-        )
-        comentario.save()
-        return redirect('index:detalhes_servico', servico_id=servico_id)
+            nome_utilizador = request.user.username
+
+            comentario = Comentario(
+                servico=servico,
+                nome_utilizador=nome_utilizador,
+                comentario=comentario_texto,
+                classificacao=classificacao
+            )
+            comentario.save()
+
+            return redirect('index:detalhes_servico', servico_id=servico_id)
+        else:
+            messages.error(request, "Registe-se ou logue na sua conta para comentar.")
+            return redirect('index:detalhes_servico', servico_id=servico_id)
 
     return redirect(reverse('index:detalhes_servico', kwargs={'servico_id': servico.id}))
+
