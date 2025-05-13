@@ -12,9 +12,17 @@ from django.db import models
 
 
 
-def pesquisar_especialistas(request):
-    especialistas = Especialista.objects.order_by('-classificacao')[:4]  # Pega os 4 melhores especialistas
-    return render(request, 'index/index.html', {'especialistas': especialistas})
+
+
+def index(request):
+    top_servicos = Servico.objects.annotate(
+        avg_rating=Avg('classificacoes__classificacao')
+    ).order_by('-avg_rating')[:6]
+
+    return render(request, 'index/index.html', {
+        'top_servicos': top_servicos,
+    })
+
 
 
 # Retorna sugestões para a pesquisa inteligente (SERVIÇOS)
@@ -100,29 +108,28 @@ def detalhes_servico(request, servico_id):
     return render(request, 'index/detalhes_servico.html', context)
 
 
+@login_required
 def enviar_comentario(request, servico_id):
-
     servico = get_object_or_404(Servico, pk=servico_id)
+
+    # Se quem manda o POST for o próprio prestador, recusa
+    if request.user == servico.prestador.user:
+        messages.warning(request, "Não pode comentar nem classificar o seu próprio serviço.")
+        return redirect('index:detalhes_servico', servico_id=servico.id)
+
     if request.method == 'POST':
+        comentario_texto = request.POST.get('comentario')
+        classificacao     = request.POST.get('classificacao')
+        nome_utilizador   = request.user.username
 
-        if request.user.is_authenticated:
-            comentario_texto = request.POST.get('comentario')
-            classificacao = request.POST.get('classificacao')
+        Comentario.objects.create(
+            servico=servico,
+            nome_utilizador=nome_utilizador,
+            comentario=comentario_texto,
+            classificacao=classificacao
+        )
+        messages.success(request, "Comentário registado com sucesso!")
+        return redirect('index:detalhes_servico', servico_id=servico.id)
 
-            nome_utilizador = request.user.username
-
-            comentario = Comentario(
-                servico=servico,
-                nome_utilizador=nome_utilizador,
-                comentario=comentario_texto,
-                classificacao=classificacao
-            )
-            comentario.save()
-
-            return redirect('index:detalhes_servico', servico_id=servico_id)
-        else:
-            messages.error(request, "Registe-se ou logue na sua conta para comentar.")
-            return redirect('index:detalhes_servico', servico_id=servico_id)
-
-    return redirect(reverse('index:detalhes_servico', kwargs={'servico_id': servico.id}))
+    return redirect('index:detalhes_servico', servico_id=servico.id)
 

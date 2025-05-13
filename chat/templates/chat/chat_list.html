@@ -1,0 +1,127 @@
+{% load static %} 
+{% load messages %} 
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {# Título da página - ajuste conforme necessário #}
+    <title>Minhas Conversas - SkillCraft</title>
+
+    {# Links para CSS - Certifique-se de que estes caminhos estão corretos e ajuste #}
+    {# É ALTAMENTE RECOMENDADO usar {% static 'caminho/do/seu/ficheiro.css' %} em vez de /static/... #}
+    <link rel="stylesheet" href="{% static 'css/chat_list.css' %}"> {# Assumindo que terá CSS específico para a lista de chat #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> {# Bootstrap para estilização (se usar) #}
+
+    <style>
+
+    </style>
+
+</head>
+<body>
+    {# Sua barra de navegação (navbar) #}
+    <div class="navbar">
+        {# Use {% static %} para imagens também #}
+        <img src="{% static 'imagens/logo.png' %}" alt="Logo" class="logo">
+        {# Pode adicionar links de navegação aqui #}
+        <nav>
+            <ul>
+                {% if user and user.is_authenticated %}
+                <li class="profile-dropdown">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="profile-icon">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22C7.9 14.43 9.8 13 12 13c2.2 0 4.1 1.43 5.98 3.98-1.29 1.94-3.5 3.22-6 3.22z"/>
+                    </svg>
+                    <div class="dropdown-content">
+                        <a href="/perfil/">Ver Perfil</a>
+                        <a href="{% url 'chat:chat_list' %}">Chat</a> {# Link para a lista de conversas #}
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit">Sair</button>
+                        </form>
+                    </div>
+                </li>
+                {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+
+    {# Conteúdo principal da página de lista de conversas #}
+    <div class="container mt-4">
+        <h2>Minhas Conversas</h2>
+
+         {# Exibe mensagens de erro ou sucesso do Django #}
+        {% if messages %}
+            <ul class="messages" style="list-style: none; padding: 0;">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+                        <p style="color: red;">{{ message }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if conversations %}
+            {# Lista das conversas #}
+            <ul class="list-group">
+                {% for conversation in conversations %}
+                    {# Cada item da lista é um link para a respetiva sala de chat #}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {# O link usa a tag url para apontar para a view 'chat_room' passando o ID da conversa #}
+                        <a href="{% url 'chat:chat_room' conversation.id %}" class="text-decoration-none">
+                            {# Identifica o outro participante na conversa #}
+                            {% if conversation.participant1 == user %}
+                                Conversa com <strong>{{ conversation.participant2.username }}</strong>
+                            {% else %}
+                                Conversa com <strong>{{ conversation.participant1.username }}</strong>
+                            {% endif %}
+
+                            {# Opcional: Mostra o serviço associado à conversa #}
+                            {% if conversation.servico %}
+                                <small class="text-muted">- Serviço: {{ conversation.servico.nome }}</small>
+                            {% endif %}
+                        </a>
+                        {# Mostra a data/hora da criação (ou última atualização) da conversa #}
+                        <small class="text-muted">{{ conversation.timestamp|date:"d/m/Y H:i" }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            {# Mensagem se o utilizador não tiver conversas #}
+            <p>Você ainda não tem conversas.</p>
+            {# Pode adicionar um link aqui para a página de pesquisa de serviços para iniciar uma #}
+            <p><a href="{% url 'index:resultados_pesquisa' %}">Pesquisar serviços para iniciar uma conversa</a></p>
+        {% endif %}
+
+    </div> {# Fim do container do conteúdo principal #}
+
+    {# Seu rodapé (footer) #}
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                {# Use {% static %} para imagens também #}
+                <img src="{% static 'imagens/slogan.png' %}" alt="Slogan">
+            </div>
+            <div class="footer-links">
+                <a href="{% url 'index:index' %}">Página inicial</a> {# Use a tag url #}
+                 <a href="{% url 'quem_somos' %}">Quem somos?</a> {# Assumindo que 'quem_somos' é um nome de URL #}
+            </div>
+            <div class="copyright">
+                <p>© SkillCraft</p>
+                <p>Portugal, Coimbra, Quinta Agrícola, Bencanta, 3045-601</p>
+            </div>
+        </div>
+    </footer>
+
+    {# Inclua o script do Bootstrap se estiver a usá-lo #}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    {# Código JavaScript adicional para esta página (se necessário, para a lista não é crucial) #}
+    <script>
+        // JavaScript específico para a página de lista de conversas (se houver)
+    </script>
+
+</body>
+</html>

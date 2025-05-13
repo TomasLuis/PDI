@@ -151,13 +151,103 @@
             background-color: #f1f1f1;
         }
 
+
+
+
         .especialistas {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            padding: 60px 5%;
-        }
+  position: relative;
+  padding: 30px 0;
+}
+
+.cards-container {
+  width: calc(3 * 250px + 2 * 20px);
+  margin: 0 auto;
+  overflow: hidden;               /* esconde tudo o que sair dessa caixa */
+}
+
+
+.cards-container::-webkit-scrollbar { display: none; }
+.cards-container { -ms-overflow-style: none; scrollbar-width: none; }
+
+
+
+.card .badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: #28a745 !important; /* forçar verde */
+  color: #fff !important;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+
+/* botões de navegação */
+.prev, .next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #8B5E34;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 10;
+}
+.prev { left: 10px; }
+.next { right: 10px; }
+
+
+.card-content .description {
+  /* altura aproximada para 3 linhas, ajuste se necessário */
+  height: 3.6em;             
+  overflow: hidden;          
+  text-overflow: ellipsis;   
+  display: -webkit-box;      
+  -webkit-line-clamp: 3;     
+  -webkit-box-orient: vertical;
+  margin-bottom: 0.5em;
+}
+
+
+
+/* empurra o conteúdo para baixo pra empurrar o botão para o fim */
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* botão “Ver Detalhes” (ou o link principal) fica sempre no rodapé */
+.card-content a {
+  margin-top: auto;
+  align-self: flex-start;
+  text-decoration: none;
+  color: #8B5E34;
+  font-weight: 600;
+}
+
+.card-image { position: relative; }
+
+.cards-container {
+  width: calc(3 * 300px + 2 * 20px); /* 3 cards de 300px + 2 gaps de 20px */
+  margin: 0 auto;
+}
+.card {
+    
+  width: 300px;    
+  margin: 0;      
+}
+.cards {
+  gap: 20px;
+}
+
+
+
+
     </style>
 </head>
 <body>
@@ -174,7 +264,7 @@
                         </svg>
                         <div class="dropdown-content">
                             <a href="/perfil/">Ver Perfil</a>
-                            <a href="/registo/registarUtilizador/">Chat</a>
+                            <a href="{% url 'chat:minhas_conversas' %}">Chat</a>
                             <form method="post" action="{% url 'logout' %}">
                                 {% csrf_token %}
                                 <button type="submit">Sair</button>
@@ -205,30 +295,33 @@
             </div>
         </section>
 
-        <section class="especialistas">
-            <button class="prev">◁</button>
-            <div class="cards-container">
-                <div class="cards">
-                    {% for especialista in especialistas %}
-                        <div class="card">
-                            <div class="card-image">
-                                <img src="{{ especialista.imagem.url }}" alt="{{ especialista.nome }}">
-                                <div class="badge">Recomendado</div>
-                            </div>
-                            <div class="card-content">
-                                <h3>{{ especialista.nome }}</h3>
-                                <p class="description">{{ especialista.descricao }}</p>
-                                <p class="category">{{ especialista.categoria }}</p>
-                                <div class="rating">
-                                    <span>★ {{ especialista.classificacao }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-            <button class="next">▷</button>
-        </section>
+       <section class="especialistas">
+  <button class="prev">◁</button>
+  <div class="cards-container">
+    <div class="cards">
+      {% for servico in top_servicos %}
+        <div class="card" onclick="location.href='{% url 'index:detalhes_servico' servico.id %}'">
+          <div class="card-image">
+            <img src="{{ servico.foto.url }}" alt="{{ servico.categoria }}">
+            <div class="badge">Recomendado</div>
+          </div>
+          <div class="card-content">
+            <h5>{{ servico.categoria }}</h5>
+            <p class="description">{{ servico.descricao }}</p>
+            <p class="rating">
+  {{ servico.avg_rating|default:"0.0"|floatformat:1 }} ★
+</p>
+
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  <button class="next">▷</button>
+</section>
+
+
+
 
         <section class="info">
             <h2>Como funcionamos?</h2>
@@ -262,115 +355,113 @@
         </div>
     </footer>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const profileIcon = document.querySelector(".profile-icon");
-            const dropdownContent = document.querySelector(".dropdown-content");
+   <script>
+document.addEventListener("DOMContentLoaded", function () {
+  // 1) Dropdown do perfil
+  const profileIcon = document.querySelector(".profile-icon");
+  const dropdownContent = document.querySelector(".dropdown-content");
+  if (profileIcon && dropdownContent) {
+    profileIcon.addEventListener("click", function () {
+      dropdownContent.style.display =
+        dropdownContent.style.display === "block" ? "none" : "block";
+    });
+  }
 
-            if (profileIcon && dropdownContent) {
-                profileIcon.addEventListener("click", function () {
-                    dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
-                });
-            }
+  // 2) Carousel infinito de 3 cards
+  const prevButton = document.querySelector(".prev");
+  const nextButton = document.querySelector(".next");
+  const cardsContainer = document.querySelector(".cards");
+  let cards = Array.from(document.querySelectorAll(".card"));
+  const totalCards = cards.length;
+  const cardsPerView = 3;
+  const gap = 20;                            // deve bater com o gap do CSS
+  const cardWidth = cards[0].offsetWidth;    // 250px no exemplo
 
-            const prevButton = document.querySelector(".prev");
-            const nextButton = document.querySelector(".next");
-            const cardsContainer = document.querySelector(".cards");
-            let cards = document.querySelectorAll(".card");
-            const totalCards = cards.length;
-            const cardWidth = 420;
-            const cardsPerView = 2;
+  // Clona os n primeiros e os n últimos para loop
+  for (let i = 0; i < cardsPerView; i++) {
+    const firstClone = cards[i].cloneNode(true);
+    const lastClone  = cards[totalCards - 1 - i].cloneNode(true);
+    cardsContainer.appendChild(firstClone);
+    cardsContainer.insertBefore(lastClone, cardsContainer.firstChild);
+  }
 
-            const cloneCount = cardsPerView;
-            for (let i = 0; i < cloneCount; i++) {
-                const firstClone = cards[i].cloneNode(true);
-                const lastClone = cards[totalCards - 1 - i].cloneNode(true);
-                cardsContainer.appendChild(firstClone);
-                cardsContainer.insertBefore(lastClone, cards[0]);
-            }
+  // Atualiza a lista após clonar
+  cards = Array.from(document.querySelectorAll(".card"));
+  let currentIndex = cardsPerView;
 
-            cards = document.querySelectorAll(".card");
-            const totalClonedCards = cards.length;
+  function updateCarousel(transition = true) {
+    cardsContainer.style.transition = transition
+      ? "transform 0.3s ease-in-out"
+      : "none";
+    const offset = -currentIndex * (cardWidth + gap);
+    cardsContainer.style.transform = `translateX(${offset}px)`;
+  }
 
-            let currentIndex = cloneCount;
+  nextButton.addEventListener("click", () => {
+    currentIndex++;
+    updateCarousel();
+    if (currentIndex >= totalCards + cardsPerView) {
+      setTimeout(() => {
+        currentIndex = cardsPerView;
+        updateCarousel(false);
+      }, 300);
+    }
+  });
 
-            function updateCarousel(transition = true) {
-                if (!transition) {
-                    cardsContainer.style.transition = "none";
-                } else {
-                    cardsContainer.style.transition = "transform 0.3s ease-in-out";
-                }
-                const offset = -currentIndex * cardWidth;
-                cardsContainer.style.transform = `translateX(${offset}px)`;
-            }
+  prevButton.addEventListener("click", () => {
+    currentIndex--;
+    updateCarousel();
+    if (currentIndex < cardsPerView) {
+      setTimeout(() => {
+        currentIndex = totalCards + cardsPerView - 1;
+        updateCarousel(false);
+      }, 300);
+    }
+  });
 
-            nextButton.addEventListener("click", function () {
-                currentIndex++;
-                updateCarousel();
+  // Posição inicial sem transição
+  updateCarousel(false);
 
-                if (currentIndex >= totalCards + cloneCount) {
-                    setTimeout(() => {
-                        currentIndex = cloneCount;
-                        updateCarousel(false);
-                    }, 300);
-                }
-            });
+  // 3) Autocomplete de pesquisa
+  const searchInput = document.getElementById("search-input");
+  const suggestionsBox = document.getElementById("suggestions");
+  const searchForm = document.getElementById("search-form");
 
-            prevButton.addEventListener("click", function () {
-                currentIndex--;
-                updateCarousel();
+  searchInput.addEventListener("input", async function () {
+    const query = this.value.trim();
+    if (query.length >= 2) {
+      try {
+        const resp = await fetch(`/api/sugestoes/servicos/?q=${encodeURIComponent(query)}`);
+        const data = await resp.json();
+        suggestionsBox.innerHTML = data
+          .map(item => `<li>${item.categoria_servico}</li>`)
+          .join("");
+        suggestionsBox.style.display = "block";
+      } catch (err) {
+        console.error("Erro ao buscar sugestões:", err);
+      }
+    } else {
+      suggestionsBox.innerHTML = "";
+      suggestionsBox.style.display = "none";
+    }
+  });
 
-                if (currentIndex < cloneCount) {
-                    setTimeout(() => {
-                        currentIndex = totalCards + cloneCount - 1;
-                        updateCarousel(false);
-                    }, 300);
-                }
-            });
+  suggestionsBox.addEventListener("click", function (e) {
+    if (e.target.tagName === "LI") {
+      searchInput.value = e.target.textContent;
+      searchForm.submit();
+    }
+  });
 
-            updateCarousel(false);
+  document.addEventListener("click", function (e) {
+    if (!suggestionsBox.contains(e.target) && e.target !== searchInput) {
+      suggestionsBox.style.display = "none";
+    }
+  });
+});
+</script>
 
-            const searchInput = document.getElementById("search-input");
-            const suggestionsBox = document.getElementById("suggestions");
-            const searchForm = document.getElementById("search-form"); // Get the form element
 
-            searchInput.addEventListener("input", async function () {
-                const query = searchInput.value.trim();
-                console.log("Termo de pesquisa no frontend:", query);
-
-                if (query.length >= 2) {
-                    try {
-                        const response = await fetch(`/api/sugestoes/servicos/?q=${encodeURIComponent(query)}`);
-                        const suggestions = await response.json();
-                        console.log("Resposta do servidor:", suggestions);
-
-                        suggestionsBox.innerHTML = suggestions
-                            .map(s => `<li>${s.categoria_servico}</li>`)
-                            .join("");
-                        suggestionsBox.style.display = "block";
-                    } catch (error) {
-                        console.error("Erro ao buscar sugestões:", error);
-                    }
-                } else {
-                    suggestionsBox.innerHTML = "";
-                    suggestionsBox.style.display = "none";
-                }
-            });
-
-            suggestionsBox.addEventListener("click", function (e) {
-                if (e.target.tagName === "LI") {
-                    searchInput.value = e.target.textContent;
-                    searchForm.submit();
-                }
-            });
-
-            document.addEventListener("click", function (e) {
-                if (!suggestionsBox.contains(e.target) && e.target !== searchInput) {
-                    suggestionsBox.style.display = "none";
-                }
-            });
-        });
-    </script>
     
 </body>
 </html>

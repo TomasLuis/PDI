@@ -381,7 +381,26 @@
                     <p style="margin-bottom: 0;">{{ servico.informacoes_adicionais }}</p>
                 </div>
                 <div style="display: flex; align-items: center;">
-                    <button class="btn btn-primary">Conversar</button>
+                    {% if user.is_authenticated %}
+        {# Mostra o botão apenas se o utilizador estiver logado #}
+        {% if user != servico.prestador.user %}
+            {# Mostra o botão se o utilizador logado NÃO for o prestador do serviço #}
+            <a href="{% url 'chat:iniciar_conversa' servico.id %}" class="btn btn-primary">
+                <i class="fas fa-comments"></i> Iniciar Conversa
+            </a>
+        {% else %}
+            {# Mensagem ou ação diferente para o próprio prestador do serviço #}
+            <p>Este é o seu serviço.</p>
+             {# Opcional: Adicionar um link para o perfil do prestador ou para gerir o serviço #}
+            {# <a href="{% url 'perfil:seu_perfil' %}" class="btn btn-outline-secondary">Ver Perfil</a> #}
+        {% endif %}
+    {% else %}
+        {# Mensagem e link para utilizadores não autenticados #}
+        <div>
+            <p style="margin-bottom: 5px;">Faça login para iniciar uma conversa.</p>
+            <a href="{% url 'login' %}" class="btn btn-outline-secondary">Login</a>
+        </div>
+    {% endif %}
                 </div>
             </div>
 
@@ -414,44 +433,61 @@
             {% endif %}
             {# FIM DO BLOCO DE MENSAGENS #}
 
-            <form method="post" action="{% url 'index:enviar_comentario' servico.id %}">
-                {% csrf_token %}
-                <div class="comment-form">
-                    <h3>Escreva um Comentário:</h3>
-                    <div class="comment-input-container">
-                        <textarea id="comentario" name="comentario" placeholder="Ex: Eu gostei muito!"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="classificacao">Classificação:</label>
-                        <select class="form-control" id="classificacao" name="classificacao">
-                            <option value="1">1 estrela</option>
-                            <option value="2">2 estrelas</option>
-                            <option value="3">3 estrelas</option>
-                            <option value="4">4 estrelas</option>
-                            <option value="5">5 estrelas</option>
-                        </select>
-                    </div>
-                    <div class="center-button">
-                        <button type="submit" class="btn btn-primary">Enviar</button>
-                    </div>
-                </div>
-            </form>
+            {% if user.is_authenticated %}
+<form method="post" action="{% url 'index:enviar_comentario' servico.id %}" class="mt-4">
+    {% csrf_token %}
+    <div class="comment-form border rounded p-4 shadow-sm bg-white">
+        <h4 class="mb-3">Escreva um Comentário:</h4>
 
-            <div class="comments-section">
-                <h3>Comentários:</h3>
-                {% for comentario in comentarios %}
-                <div class="comment-card">
-                    <div class="comment-header">
-                        <strong>{{ comentario.nome_utilizador }}</strong>
-                        <small>{{ comentario.data_criacao|date:"d/m/Y H:i" }}</small>
+        <div class="mb-3">
+            <textarea class="form-control" id="comentario" name="comentario" rows="4" placeholder="Ex: Eu gostei muito!"></textarea>
+        </div>
 
-                    </div>
-                    <div class="comment-content">
-                        <p>{{ comentario.comentario }}</p>
-                    </div>
+        <div class="mb-3">
+            <label for="classificacao" class="form-label">Classificação:</label>
+            <select class="form-select" id="classificacao" name="classificacao">
+                <option value="1">1 estrela</option>
+                <option value="2">2 estrelas</option>
+                <option value="3">3 estrelas</option>
+                <option value="4">4 estrelas</option>
+                <option value="5">5 estrelas</option>
+            </select>
+        </div>
+
+        <div class="text-end">
+            <button type="submit" class="btn btn-success">Enviar</button>
+        </div>
+    </div>
+</form>
+
+{% else %}
+<div class="alert alert-info mt-4 text-center shadow-sm">
+    <strong>Aviso:</strong> Para comentar ou classificar, é necessário <a href="{% url 'login' %}" class="alert-link">iniciar sessão</a>.
+</div>
+{% endif %}
+
+            {% if comentarios|length > 0 and comentarios|dictsortreversed:"data_criacao"|yesno:"1,," %}
+    {% for comentario in comentarios %}
+        {% if comentario.comentario %}
+            {% if forloop.first %}
+                <div class="comments-section">
+                    <h3>Comentários:</h3>
+            {% endif %}
+            <div class="comment-card">
+                <div class="comment-header">
+                    <strong>{{ comentario.nome_utilizador }}</strong>
+                    <small>{{ comentario.data_criacao|date:"d/m/Y H:i" }}</small>
                 </div>
-                {% endfor %}
+                <div class="comment-content">
+                    <p>{{ comentario.comentario }}</p>
+                </div>
             </div>
+            {% if forloop.last %}
+                </div>  {# fecha .comments-section #}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
         </div>
     </main>
 

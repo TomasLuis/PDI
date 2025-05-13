@@ -1,0 +1,631 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil - SkillCraft</title>
+    <link rel="stylesheet" href="{% static 'css/perfil.css' %}">
+    <style>
+        /* Estilos do modal */
+        .modal-container {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        /* Modal Alterar Dados */
+        #alterarDadosModal .modal-content {
+            background-color: rgba(254, 254, 254, 0.73);
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 20%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Modal Adicionar/Editar Serviço (CSS unificado) */
+        #adicionarServicoModal .modal-content,
+        #editarServicoModal .modal-content {
+            background-color: rgba(254, 254, 254, 0.78);
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #adicionarServicoModal .modal-content h2,
+        #editarServicoModal .modal-content h2 {
+            text-align: center;
+        }
+
+        #adicionarServicoModal input,
+        #adicionarServicoModal textarea,
+        #adicionarServicoModal select,
+        #editarServicoModal input,
+        #editarServicoModal textarea,
+        #editarServicoModal select {
+            width: 100%;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        #adicionarServicoModal textarea,
+        #editarServicoModal textarea {
+            resize: none;
+        }
+
+        #adicionarServicoModal label,
+        #editarServicoModal label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        #adicionarServicoModal .modal-buttons,
+        #editarServicoModal .modal-buttons {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        #adicionarServicoModal .modal-buttons button,
+        #editarServicoModal .modal-buttons button {
+            padding: 10px 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        #adicionarServicoModal .modal-buttons button[type="submit"],
+        #editarServicoModal .modal-buttons button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+       .info-row {
+    align-items: center;
+
+}
+
+.info-label {
+    width: 100px; /* Reduz a largura dos labels */
+    margin-right: 20px; /* Reduz o espaço entre o label e o campo */
+}
+
+.info-input {
+    flex: 1;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+        /* Estilos para exibir serviços */
+        .servico-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .servico-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin-right: 20px;
+            border-radius: 8px;
+        }
+
+        .servico-item div {
+            flex-grow: 1;
+        }
+
+        /* Estilos para o ícone de chat */
+        .servico-item button.icon-button {
+            background: none;
+            border: none;
+            padding: 0;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+
+        .servico-item button.icon-button svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Novo estilo para o botão "Editar" */
+        .editar-servico-btn {
+            padding: 8px 12px;
+            background-color: #008CBA;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-left: 10px;
+            font-size: 0.9em;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* Estilos de erro */
+        .error-message {
+            color: red;
+            margin-top: 5px;
+        }
+        
+        .profile-picture {
+            width: 250px;
+            height: 250px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .profile-picture input[type="file"] {
+            display: none;
+        }
+        
+        .profile-picture label {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .profile-picture img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+        }
+        
+        .profile-picture label:hover img {
+            opacity: 0.7;
+        }
+        
+        .camera-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 2em;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .profile-picture label:hover .camera-overlay {
+            opacity: 1;
+        }
+        
+        .picture-placeholder {
+            width: 100%;
+            height: 100%;
+            background-color: #ddd;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #888;
+        }
+        
+        
+    </style>
+</head>
+
+<body>
+    <div class="perfil-container">
+        <header>
+            <nav class="navbar">
+                <div class="logo">
+                    <img src="{% static 'imagens/logo.png' %}" alt="SkillCraft">
+                </div>
+            </nav>
+        </header>
+        <div class="content">
+            <div class="profile-picture">
+                <input type="file" id="fotoPerfilInput" accept="image/*">
+                <label for="fotoPerfilInput">
+                    {% if perfil.foto_perfil %}  <img id="fotoPerfilPreview" src="{{ perfil.foto_perfil.url }}" alt="Foto de Perfil">
+                    {% else %}
+                        <div class="picture-placeholder">Foto de Perfil</div>
+                    {% endif %}
+                    <div class="camera-overlay">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                </label>
+            </div>
+            <div class="info">
+                <div class="info-row">
+                    <div class="info-label">Email</div>
+                    <input type="text" class="info-input" value="{{ perfil.user.email }}" readonly>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Nome</div>
+                    <input type="text" class="info-input"
+                           value="{% if perfil.nome %}{{ perfil.nome }}{% else %}{% endif %}" readonly>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Contacto</div>
+                    <input type="text" class="info-input"
+                           value="{% if perfil.contacto %}{{ perfil.contacto }}{% else %}{% endif %}" readonly>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Distrito</div>
+                    <input type="text" class="info-input"
+                           value="{% if perfil.distrito %}{{ perfil.distrito }}{% else %}{% endif %}" readonly>
+                </div>
+                <button class="alterar-dados" id="alterarDadosBtn">Alterar Dados</button>
+            </div>
+        </div>
+        <button class="adicionar-servico" id="adicionarServicoBtn">Adicionar Serviço</button>
+
+        {% if servicos %}
+  {% for servico in servicos %}
+    <div class="servico-item">
+      <img src="{{ servico.foto.url }}" alt="{{ servico.categoria }}">
+      <div>
+        <h3>{{ servico.categoria }}</h3>
+        <p>Descrição: {{ servico.descricao }}</p>
+        <p>
+          Classificação:
+          {% if servico.avg_rating %}
+            {{ servico.avg_rating|floatformat:1 }} ★
+          {% else %}
+            Ainda sem avaliações
+          {% endif %}
+        </p>
+      </div>
+
+      <!-- Botão de Chat específico para este serviço -->
+      <button class="icon-button">
+            <a href="{% url 'chat:minhas_conversas' %}" class="icon-button" title="Ver mensagens de clientes">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                    <g id="SVGRepo_iconCarrier">
+                        
+                        <path
+                            d="M13 12C13 12.5523 12.5523 13 12 13C11.4477 13 11 12.5523 11 12C11 11.4477 11.4477 11 12 11C12.5523 11 13 11.4477 13 12Z"
+                            fill="#1C274C"></path>
+                        <path
+                            d="M17 12C17 12.5523 16.5523 13 16 13C15.4477 13 15 12.5523 15 12C15 11.4477 15.4477 11 16 11C16.5523 11 17 11.4477 17 12Z"
+                            fill="#1C274C"></path>
+                        <path fill-rule="evenodd" clip-rule="evenodd"
+                            d="M22.75 12C22.75 6.06294 17.9371 1.25 12 1.25C6.06294 1.25 1.25 6.06294 1.25 12C1.25 13.7183 1.65371 15.3445 2.37213 16.7869C2.47933 17.0021 2.50208 17.2219 2.4526 17.4068L1.857 19.6328C1.44927 21.1566 2.84337 22.5507 4.3672 22.143L6.59324 21.5474C6.77814 21.4979 6.99791 21.5207 7.21315 21.6279C8.65553 22.3463 10.2817 22.75 12 22.75C17.9371 22.75 22.75 17.9371 22.75 12ZM12 2.75C17.1086 2.75 21.25 6.89137 21.25 12C21.25 17.1086 17.1086 21.25 12 21.25C10.5189 21.25 9.12121 20.9025 7.88191 20.2852C7.38451 20.0375 6.78973 19.9421 6.20553 20.0984L3.97949 20.694C3.57066 20.8034 3.19663 20.4293 3.30602 20.0205L3.90163 17.7945C4.05794 17.2103 3.96254 16.6155 3.7148 16.1181C3.09752 14.8788 2.75 13.4811 2.75 12C2.75 6.89137 6.89137 2.75 12 2.75Z"
+                            fill="#1C274C"></path>
+                    </g>
+                </svg>
+            </a>
+            </button>
+
+      <!-- Botão Editar -->
+      <button class="editar-servico-btn" data-servico-id="{{ servico.id }}">
+        Editar
+      </button>
+
+      <!-- Botão Apagar -->
+      <button class="apagar-servico-btn" data-servico-id="{{ servico.id }}">
+        Apagar Serviço
+      </button>
+    </div>
+  {% endfor %}
+{% else %}
+  <p>Você ainda não cadastrou nenhum serviço.</p>
+{% endif %}
+
+    </div>
+
+    <div id="alterarDadosModal" class="modal-container">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Alterar Dados</h2>
+            <form method="post" action="{% url 'atualizar_perfil' %}">
+                {% csrf_token %}
+                {% if erro_email %}
+                <p class="error-message">{{ erro_email }}</p>
+                {% endif %}
+                <div class="info-row">
+                    <div class="info-label">Email</div>
+                    <input type="email" class="info-input" name="email" value="{{ perfil.user.email }}"
+                           placeholder="Ex: XXXXX@gmail.com">
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Nome</div>
+                    <input type="text" class="info-input" name="nome" placeholder="Ex: Alberto Joaquim">
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Contacto</div>
+                    <input type="text" class="info-input" name="contacto" placeholder="Ex: #351xxx - XXX - XXX">
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Distrito</div>
+                    <input type="text" class="info-input" name="distrito" placeholder="Ex: Coimbra">
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="gravar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="adicionarServicoModal" class="modal-container">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Adicionar Serviço</h2>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <p>
+                    <label for="id_categoria">Categoria:</label>
+                    <input type="text" name="categoria" id="id_categoria" autocomplete="on">
+                </p>
+                <p>
+                    <label for="id_descricao">Descrição:</label>
+                    <textarea name="descricao" id="id_descricao" autocomplete="on"></textarea>
+                </p>
+                <p>
+                    <label for="id_email">Email:</label>
+                    <input type="email" name="email" id="id_email" autocomplete="email" value="{{ perfil.user.email }}">
+                </p>
+                <p>
+                    <label for="id_nome">Nome:</label>
+                    <input type="text" name="nome" id="id_nome" autocomplete="name" value="{% if perfil.nome %}{{ perfil.nome }}{% endif %}">
+                </p>
+                <p>
+                    <label for="id_contacto">Contacto:</label>
+                    <input type="text" name="contacto" id="id_contacto" autocomplete="tel" value="{% if perfil.contacto %}{{ perfil.contacto }}{% endif %}">
+                </p>
+                <p>
+                    <label for="id_distrito">Distrito:</label>
+                    <input type="text" name="distrito" id="id_distrito" autocomplete="address-level1" value="{% if perfil.distrito %}{{ perfil.distrito }}{% endif %}">
+                </p>
+                <p>
+                    <label for="id_informacoes_adicionais">Informações adicionais:</label>
+                    <textarea name="informacoes_adicionais" id="id_informacoes_adicionais" autocomplete="on"></textarea>
+                </p>
+                <p>
+                    <label for="id_foto">Foto:</label>
+                    <input type="file" name="foto" id="id_foto" autocomplete="on">
+                </p>
+                <div class="modal-buttons">
+                    <button type="submit" class="gravar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="editarServicoModal" class="modal-container">
+        <div class="modal-content">
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Modal Alterar Dados
+        const alterarDadosBtn = document.getElementById('alterarDadosBtn');
+        const alterarDadosModal = document.getElementById('alterarDadosModal');
+        const closeAlterarDados = document.querySelector('#alterarDadosModal .close');
+
+        alterarDadosBtn?.addEventListener('click', function () {
+            alterarDadosModal.style.display = 'block';
+        });
+
+        closeAlterarDados?.addEventListener('click', function () {
+            alterarDadosModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', function (event) {
+            if (event.target === alterarDadosModal) {
+                alterarDadosModal.style.display = 'none';
+            }
+        });
+
+        // Modal Adicionar Serviço
+        const adicionarServicoBtn = document.getElementById('adicionarServicoBtn');
+        const adicionarServicoModal = document.getElementById('adicionarServicoModal');
+        const closeAdicionarServico = document.querySelector('#adicionarServicoModal .close');
+        const adicionarServicoForm = document.querySelector('#adicionarServicoModal form');
+
+        adicionarServicoBtn?.addEventListener('click', function () {
+            adicionarServicoModal.style.display = 'block';
+        });
+
+        closeAdicionarServico?.addEventListener('click', function () {
+            adicionarServicoModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', function (event) {
+            if (event.target === adicionarServicoModal) {
+                adicionarServicoModal.style.display = 'none';
+            }
+        });
+
+        // Envio do formulário "Adicionar Serviço"
+        adicionarServicoForm?.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+
+            fetch("{% url 'adicionar_servico' %}", {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Resposta do servidor:', data);
+                if (data.success) {
+                    location.reload();
+                } else {
+                    console.error('Erro ao adicionar o serviço:', data.errors || data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao enviar o formulário:', error);
+            });
+        });
+
+        // Modal Editar Serviço
+        const editarServicoModal = document.getElementById('editarServicoModal');
+        document.querySelectorAll('.editar-servico-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const servicoId = this.getAttribute('data-servico-id');
+                fetch(`/editar_servico/${servicoId}/`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Erro na resposta da rede');
+                        return response.json();
+                    })
+                    .then(data => {
+                        const formHtml = data.form_html;
+                        editarServicoModal.innerHTML = `
+                            <div class="modal-content">
+                                <h2>Editar Serviço</h2>
+                                <form method="post" enctype="multipart/form-data" id="editarServicoForm">
+                                    {% csrf_token %}
+                                    ${formHtml}
+                                    <div class="modal-buttons">
+                                        <button type="submit">Guardar Alterações</button>
+                                        <button type="button" class="close-modal">Cancelar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        `;
+                        editarServicoModal.style.display = 'block';
+
+                        document.querySelector('.close-modal')?.addEventListener('click', () => {
+                            editarServicoModal.style.display = 'none';
+                        });
+
+                        document.getElementById('editarServicoForm')?.addEventListener('submit', function (event) {
+                            event.preventDefault();
+                            const formData = new FormData(this);
+                            fetch(`/editar_servico/${servicoId}/`, {
+                                method: 'POST',
+                                body: formData
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        location.reload();
+                                    } else {
+                                        console.error('Erro ao editar o serviço:', data.errors);
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Erro ao enviar o formulário:', error);
+                                });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Erro ao buscar o formulário de edição:', error);
+                    });
+            });
+        });
+
+        // Apagar Serviço
+        document.querySelectorAll('.apagar-servico-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const servicoId = this.getAttribute('data-servico-id');
+                if (confirm('Tem certeza de que deseja apagar este serviço?')) {
+                    fetch(`/apagar_servico/${servicoId}/`, {
+                        method: 'DELETE',
+                        headers: { 'X-CSRFToken': getCookie('csrftoken') }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            console.error('Erro ao apagar o serviço:', data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao apagar o serviço:', error);
+                    });
+                }
+            });
+        });
+
+        // Upload de Foto de Perfil
+        const fotoPerfilInput = document.getElementById('fotoPerfilInput');
+        const fotoPerfilPreview = document.getElementById('fotoPerfilPreview');
+
+        fotoPerfilInput?.addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    if (fotoPerfilPreview) {
+                        fotoPerfilPreview.src = e.target.result;
+                    }
+                };
+                reader.readAsDataURL(file);
+
+                const formData = new FormData();
+                formData.append('foto', file);
+
+                fetch('/atualizar_foto_perfil/', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        fotoPerfilPreview.src = data.foto_url;
+                    } else {
+                        console.error('Erro ao atualizar a foto de perfil:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao enviar a foto de perfil:', error);
+                });
+            }
+        });
+
+        // Função utilitária para obter o CSRF
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                document.cookie.split(';').forEach(cookie => {
+                    const trimmed = cookie.trim();
+                    if (trimmed.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(trimmed.slice(name.length + 1));
+                    }
+                });
+            }
+            return cookieValue;
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -36,6 +36,7 @@ urlpatterns = [
     path('editar_servico/<int:pk>/', views.editar_servico, name='editar_servico'),
     path('atualizar_foto_perfil/', views.atualizar_foto_perfil, name='atualizar_foto_perfil'), # Adicione esta linha
     path('quem_somos/', serve, {'path': 'quem_somos/quem_somos.html', 'document_root': os.path.join(settings.BASE_DIR, 'quem_somos', 'static')}),
+    path('chat/', include('chat.urls', namespace='chat')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

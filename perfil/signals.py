@@ -4,10 +4,10 @@ from django.contrib.auth.models import User
 from .models import Perfil
 
 @receiver(post_save, sender=User)
-def criar_perfil(sender, instance, created, **kwargs):
+def criar_ou_atualizar_perfil(sender, instance, created, **kwargs):
     if created:
         Perfil.objects.create(user=instance)
-
-@receiver(post_save, sender=User)
-def salvar_perfil(sender, instance, **kwargs):
-    instance.perfil.save()
+    else:
+        # Só atualiza se o perfil já existir
+        if hasattr(instance, 'perfil'):
+            instance.perfil.save()
