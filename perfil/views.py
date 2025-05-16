@@ -6,13 +6,12 @@ from .forms import ServicoForm
 from .models import Servico, Comentario, Perfil
 from chat.models import Conversation
 from django.db.models import Avg
+from django import forms
 
 @login_required
 def perfil(request):
-    # busca o perfil do prestador
     perfil_obj = get_object_or_404(Perfil, user=request.user)
 
-    # formulário pré-populado
     form = ServicoForm(initial={
         'email':    request.user.email,
         'nome':     perfil_obj.nome,
@@ -31,7 +30,6 @@ def perfil(request):
         'servicos': servicos,
     })
 
-    # Filtra serviços corretamente com base no User, não no Perfil
     servicos = Servico.objects.filter(prestador=perfil)
 
 
@@ -89,8 +87,8 @@ def adicionar_servico(request):
         if form.is_valid():
             try:
                 servico = form.save(commit=False)
-                perfil = Perfil.objects.get(user=request.user)  # 🔁 Correto: obter o Perfil
-                servico.prestador = perfil                     # ✅ Associar corretamente
+                perfil = Perfil.objects.get(user=request.user)  
+                servico.prestador = perfil                     
                 servico.save()
                 return JsonResponse({'success': True})
             except Perfil.DoesNotExist:
@@ -116,17 +114,21 @@ def editar_servico(request, pk):
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
     else:
         form = ServicoForm(instance=servico)
-        form_html = str(form.as_p())  # Renderiza o formulário como parágrafos
+        form_html = str(form.as_p()) 
         return JsonResponse({'form_html': form_html})
     
 @login_required
 def apagar_servico(request, servico_id):
-    if request.method == 'DELETE':
-        servico = get_object_or_404(Servico, id=servico_id, perfil__user=request.user)
-        servico.delete()
-        return JsonResponse({'success': True})
-    else:
-        return JsonResponse({'success': False, 'error': 'Método inválido'})
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        try:
+            perfil = request.user.perfil  
+            servico = get_object_or_404(Servico, id=servico_id, prestador=perfil)
+            servico.delete()
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Método inválido'})
+
     
 @login_required
 def atualizar_foto_perfil(request):
@@ -136,7 +138,6 @@ def atualizar_foto_perfil(request):
         if perfil:
             perfil.foto_perfil = foto
             perfil.save()
-            # Adiciona a URL da foto à resposta
             return JsonResponse({'success': True, 'foto_url': perfil.foto_perfil.url})
         else:
             return JsonResponse({'success': False, 'error': 'Perfil não encontrado'})

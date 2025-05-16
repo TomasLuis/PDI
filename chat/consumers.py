@@ -10,12 +10,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         user = self.scope['user']
 
-        # Se quiseres validar se o user pertence à conversa, descomenta isto:
-        # is_participant = await self.is_user_in_conversation(user)
-        # if not is_participant:
-        #     await self.close()
-        #     return
-
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 

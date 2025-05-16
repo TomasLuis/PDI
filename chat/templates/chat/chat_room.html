@@ -10,7 +10,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-
         header {
             background: #8B5E34;
             color: white;
@@ -22,49 +21,64 @@
             position: relative;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        .logo img { height: 60px; }
-        nav { position: absolute; right: 5%; }
-        nav ul { list-style: none; display: flex; gap: 20px; margin: 0; padding: 0; }
+
+        .logo img {
+            height: 60px;
+        }
+
+        nav {
+            position: absolute;
+            right: 5%;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            margin: 0;
+            padding: 0;
+        }
+
         nav ul li a {
             color: white;
             text-decoration: none;
             font-weight: 500;
             font-size: 16px;
         }
+
         .chat-box {
-    height: 400px;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    background-color: #fff;
-}
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background-color: #fff;
+        }
 
-.message {
-    max-width: 60%;
-    margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 15px;
-    clear: both;
-}
+        .message {
+            max-width: 60%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 15px;
+            clear: both;
+        }
 
-.message.sent {
-    background-color: #dcf8c6; /* verde claro */
-    float: right;
-    text-align: right;
-}
+        .message.sent {
+            background-color: #dcf8c6;
+            float: right;
+            text-align: right;
+        }
 
-.message.received {
-    background-color: #f1f0f0; /* cinza claro */
-    float: left;
-    text-align: left;
-}
+        .message.received {
+            background-color: #f1f0f0;
+            float: left;
+            text-align: left;
+        }
 
-.message-content {
-    word-wrap: break-word;
-}
-
+        .message-content {
+            word-wrap: break-word;
+        }
     </style>
 </head>
 <body>
@@ -76,25 +90,32 @@
 
 <div class="container mt-4">
     <h2>Conversa com {{ other_name }}</h2>
+
     {% if conversation.servico %}
     <p>Relacionado ao serviço:
-        <a href="{% url 'index:detalhes_servico' conversation.servico.id %}">{{ servico_nome_completo }}</a>
+        <a href="{% url 'index:detalhes_servico' conversation.servico.id %}">
+            {{ servico_nome_completo }}
+        </a>
     </p>
     {% endif %}
 
     <div id="chat-box" class="chat-box">
-    {% for message in messages %}
+        {% for message in messages %}
         <div class="message {% if message.sender == user %}sent{% else %}received{% endif %}">
-            <p><strong>{{ message.sender.username }}</strong> <small>{{ message.timestamp|date:"d/m/Y H:i" }}</small></p>
+            <p>
+                <strong>{{ message.sender.username }}</strong>
+                <small>{{ message.timestamp|date:"d/m/Y H:i" }}</small>
+            </p>
             <div class="message-content">{{ message.content }}</div>
         </div>
-    {% empty %}
+        {% empty %}
         <p>Ainda não há mensagens nesta conversa.</p>
-    {% endfor %}
-</div>
+        {% endfor %}
+    </div>
 
     <form id="chat-form" class="input-group mb-3">
-        <input id="chat-message-input" type="text" class="form-control" placeholder="Digite sua mensagem aqui..." autocomplete="off">
+        <input id="chat-message-input" type="text" class="form-control"
+               placeholder="Digite sua mensagem aqui..." autocomplete="off">
         <button id="chat-message-submit" class="btn btn-primary" type="submit">Enviar</button>
     </form>
 </div>
@@ -106,7 +127,7 @@
         </div>
         <div class="footer-links">
             <a href="{% url 'index:index' %}">Página inicial</a>
-            <a href="quem_somos">Quem somos?</a>
+            <a href="/quem_somos/">Quem Somos</a>
         </div>
         <div class="copyright">
             <p>© SkillCraft</p>
@@ -114,20 +135,23 @@
         </div>
     </div>
 </footer>
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const chatBox = document.getElementById('chat-box');
+    
+    // scroll
     if (chatBox) {
-      // Scrolla até ao final da caixa de chat
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // O teu código de WebSocket abaixo (se já não estiver dentro desse mesmo listener)
+    // websocket
     const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
-    const wsPort   = window.location.port === "8000" ? "8001" : window.location.port;
-    const wsUrl    = `${wsScheme}://${window.location.hostname}:${wsPort}/ws/chat/{{ conversation.id }}/`;
+    const wsPort = window.location.port === "8000" ? "8001" : window.location.port;
+    const wsUrl = `${wsScheme}://${window.location.hostname}:${wsPort}/ws/chat/{{ conversation.id }}/`;
     const chatSocket = new WebSocket(wsUrl);
 
+    // ao receber
     chatSocket.onmessage = function(e) {
       const data = JSON.parse(e.data);
       const msgDiv = document.createElement('div');
@@ -140,12 +164,14 @@
       chatBox.scrollTop = chatBox.scrollHeight;
     };
 
+    // fechar socket
     chatSocket.onclose = e => console.error('WebSocket fechado inesperadamente.');
 
+    // ao enviar
     document.getElementById('chat-form').onsubmit = function(e) {
       e.preventDefault();
       const input = document.getElementById('chat-message-input');
-      const text  = input.value.trim();
+      const text = input.value.trim();
       if (text) {
         chatSocket.send(JSON.stringify({ message: text }));
         input.value = '';

@@ -34,7 +34,7 @@ def obter_sugestoes_servicos(request):
     return JsonResponse([], safe=False)
 
 
-# Exibe os resultados da pesquisa
+# mostra os resultados da pesquisa
 def resultados_pesquisa(request):
     query = request.GET.get('q', '')
     order_by = request.GET.get('order_by', '')
@@ -42,10 +42,9 @@ def resultados_pesquisa(request):
 
     resultados = Servico.objects.all()
 
-    # CORRIGIDO: Use 'comentarios__classificacao' e 'comentarios'
     resultados = resultados.annotate(
-        avg_avaliacao=Round(Avg('comentarios__classificacao'), 1), # <-- Corrigido
-        comment_count=Count('comentarios') # <-- Corrigido
+        avg_avaliacao=Round(Avg('comentarios__classificacao'), 1), 
+        comment_count=Count('comentarios') 
     )
 
 

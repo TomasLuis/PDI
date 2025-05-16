@@ -19,8 +19,7 @@
             flex-direction: column;
             min-height: 100vh;
             margin: 0;
-            background-color: #f9f9f9;
-            color: #333;
+
         }
 
         main {
@@ -330,7 +329,7 @@
                         </svg>
                         <div class="dropdown-content">
                             <a href="/perfil/">Ver Perfil</a>
-                            <a href="/registo/registarUtilizador/">Chat</a>
+                            <a href="{% url 'chat:minhas_conversas' %}">Chat</a>
                             <form method="post" action="{% url 'logout' %}">
                                 {% csrf_token %}
                                 <button type="submit">Sair</button>
@@ -382,20 +381,14 @@
                 </div>
                 <div style="display: flex; align-items: center;">
                     {% if user.is_authenticated %}
-        {# Mostra o botão apenas se o utilizador estiver logado #}
         {% if user != servico.prestador.user %}
-            {# Mostra o botão se o utilizador logado NÃO for o prestador do serviço #}
             <a href="{% url 'chat:iniciar_conversa' servico.id %}" class="btn btn-primary">
                 <i class="fas fa-comments"></i> Iniciar Conversa
             </a>
         {% else %}
-            {# Mensagem ou ação diferente para o próprio prestador do serviço #}
             <p>Este é o seu serviço.</p>
-             {# Opcional: Adicionar um link para o perfil do prestador ou para gerir o serviço #}
-            {# <a href="{% url 'perfil:seu_perfil' %}" class="btn btn-outline-secondary">Ver Perfil</a> #}
         {% endif %}
     {% else %}
-        {# Mensagem e link para utilizadores não autenticados #}
         <div>
             <p style="margin-bottom: 5px;">Faça login para iniciar uma conversa.</p>
             <a href="{% url 'login' %}" class="btn btn-outline-secondary">Login</a>
@@ -497,7 +490,7 @@
                 <img src="{% static 'imagens/slogan.png' %}">
             </div>
             <div class="footer-links">
-                <a href='quem_somos'>Quem somos?</a>
+                <a href="/quem_somos/">Quem Somos</a>
                 <a href="{% url 'index:index' %}">Página inicial</a>
             </div>
             <div class="copyright">
@@ -530,7 +523,6 @@
             if (searchInput && suggestionsList) {
                 searchInput.addEventListener('input', () => {
                     const query = searchInput.value.toLowerCase();
-                    // Simulando dados de sugestão (substitua com seus dados reais)
                     const suggestions = [
                         "Serviço de Limpeza",
                         "Serviço de Jardinagem",
@@ -543,7 +535,7 @@
                         suggestion.toLowerCase().includes(query)
                     );
 
-                    suggestionsList.innerHTML = ''; // Limpa a lista
+                    suggestionsList.innerHTML = '';
                     if (query && filteredSuggestions.length > 0) {
                         filteredSuggestions.forEach(suggestion => {
                             const li = document.createElement('li');

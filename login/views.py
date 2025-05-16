@@ -18,7 +18,7 @@ def login_view(request):
             password = form.cleaned_data['password']
             user = authenticate(request, username=email, password=password)
             if user is not None:
-                if user.is_active:  # Adicione esta verificação
+                if user.is_active:  
                     login(request, user)
                     return redirect('index:index')
                 else:
@@ -49,7 +49,7 @@ def recuperar_senha_email(request):
         enviado = send_mail(
             'Código de Recuperação de Senha',
             f'Seu código de recuperação é: {codigo}',
-            settings.EMAIL_HOST_USER,  # Configurado no settings.py
+            settings.EMAIL_HOST_USER,  
             [email],
             fail_silently=False,
         )

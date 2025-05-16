@@ -8,7 +8,13 @@ class SignUpForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ["email", "password1", "password2"]  # Apenas esses campos
+        fields = ["email", "password1", "password2"]
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email").lower()
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Este email já se encontra registado.")
+        return email
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -19,8 +25,15 @@ class SignUpForm(forms.ModelForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.username = user.email  # Define o username como o email
-        user.set_password(self.cleaned_data["password1"])  # Define a senha corretamente
+        user.email = self.cleaned_data["email"].lower()
+        user.username = user.email  # usa email como username
+        user.set_password(self.cleaned_data["password1"])
         if commit:
             user.save()
         return user
+    
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Email já se encontra registado.")
+        return email

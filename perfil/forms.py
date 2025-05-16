@@ -10,4 +10,14 @@ class PerfilForm(forms.Form):
 class ServicoForm(forms.ModelForm):
     class Meta:
         model = Servico
-        fields = ['categoria', 'descricao', 'email', 'nome', 'contacto', 'distrito', 'informacoes_adicionais', 'foto']
+        fields = ['categoria', 'descricao', 'foto', 'email', 'nome', 'contacto', 'distrito', 'informacoes_adicionais']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['foto'].widget = forms.FileInput()
+
+    def clean_foto(self):
+        foto = self.cleaned_data.get('foto')
+        if not foto:
+            raise forms.ValidationError("É obrigatório colocar foto no serviço.")
+        return foto

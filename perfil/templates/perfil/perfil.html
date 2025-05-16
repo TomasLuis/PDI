@@ -8,236 +8,254 @@
     <title>Perfil - SkillCraft</title>
     <link rel="stylesheet" href="{% static 'css/perfil.css' %}">
     <style>
-        /* Estilos do modal */
-        .modal-container {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgb(0, 0, 0);
-            background-color: rgba(0, 0, 0, 0.4);
-        }
+       /* Estilos do modal */
+.modal-container {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  inset: 0; /* shorthand for top:0; right:0; bottom:0; left:0; */
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
 
-        /* Modal Alterar Dados */
-        #alterarDadosModal .modal-content {
-            background-color: rgba(254, 254, 254, 0.73);
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 20%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+/* Modal Alterar Dados */
+#alterarDadosModal .modal-content {
+  background-color: rgba(254, 254, 254, 0.73);
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 20%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-        /* Modal Adicionar/Editar Serviço (CSS unificado) */
-        #adicionarServicoModal .modal-content,
-        #editarServicoModal .modal-content {
-            background-color: rgba(254, 254, 254, 0.78);
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 400px;
-            height: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+/* Modal Adicionar/Editar Serviço */
+#adicionarServicoModal .modal-content,
+#editarServicoModal .modal-content {
+  background-color: rgba(254, 254, 254, 0.78);
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-        #adicionarServicoModal .modal-content h2,
-        #editarServicoModal .modal-content h2 {
-            text-align: center;
-        }
+#adicionarServicoModal .modal-content h2,
+#editarServicoModal .modal-content h2 {
+  text-align: center;
+}
 
-        #adicionarServicoModal input,
-        #adicionarServicoModal textarea,
-        #adicionarServicoModal select,
-        #editarServicoModal input,
-        #editarServicoModal textarea,
-        #editarServicoModal select {
-            width: 100%;
-            margin-bottom: 10px;
-            box-sizing: border-box;
-            border: 1px solid #ddd;
-            padding: 8px;
-            font-size: 14px;
-        }
+/* Inputs e selects nos modais */
+#adicionarServicoModal input,
+#adicionarServicoModal textarea,
+#adicionarServicoModal select,
+#editarServicoModal input,
+#editarServicoModal textarea,
+#editarServicoModal select {
+  width: 100%;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  padding: 8px;
+  font-size: 14px;
+}
 
-        #adicionarServicoModal textarea,
-        #editarServicoModal textarea {
-            resize: none;
-        }
+#adicionarServicoModal textarea,
+#editarServicoModal textarea {
+  resize: none;
+}
 
-        #adicionarServicoModal label,
-        #editarServicoModal label {
-            font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 16px;
-        }
+#adicionarServicoModal label,
+#editarServicoModal label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 16px;
+}
 
-        #adicionarServicoModal .modal-buttons,
-        #editarServicoModal .modal-buttons {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
+/* Botões nos modais */
+#adicionarServicoModal .modal-buttons,
+#editarServicoModal .modal-buttons {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
 
-        #adicionarServicoModal .modal-buttons button,
-        #editarServicoModal .modal-buttons button {
-            padding: 10px 16px;
-            border: none;
-            cursor: pointer;
-            border-radius: 4px;
-        }
+#adicionarServicoModal .modal-buttons button,
+#editarServicoModal .modal-buttons button {
+  padding: 10px 16px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
 
-        #adicionarServicoModal .modal-buttons button[type="submit"],
-        #editarServicoModal .modal-buttons button[type="submit"] {
-            background-color: #4CAF50;
-            color: white;
-        }
+#adicionarServicoModal .modal-buttons button[type="submit"],
+#editarServicoModal .modal-buttons button[type="submit"] {
+  background-color: #4CAF50;
+  color: white;
+}
 
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+/* Botão de fechar */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-       .info-row {
-    align-items: center;
-
+/* Estilos gerais de perfil */
+.info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
 }
 
 .info-label {
-    width: 100px; /* Reduz a largura dos labels */
-    margin-right: 20px; /* Reduz o espaço entre o label e o campo */
+  width: 100px;
+  margin-right: 20px;
 }
 
 .info-input {
-    flex: 1;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-        /* Estilos para exibir serviços */
-        .servico-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
+/* Exibição de serviços */
+.servico-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
 
-        .servico-item img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            margin-right: 20px;
-            border-radius: 8px;
-        }
+.servico-item img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-right: 20px;
+  border-radius: 8px;
+}
 
-        .servico-item div {
-            flex-grow: 1;
-        }
+.servico-item div {
+  flex-grow: 1;
+}
 
-        /* Estilos para o ícone de chat */
-        .servico-item button.icon-button {
-            background: none;
-            border: none;
-            padding: 0;
-            margin-left: 5px;
-            cursor: pointer;
-        }
+/* Ícone de chat */
+.servico-item .icon-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 5px;
+  cursor: pointer;
+}
 
-        .servico-item button.icon-button svg {
-            width: 24px;
-            height: 24px;
-        }
+.servico-item .icon-button svg {
+  width: 24px;
+  height: 24px;
+}
 
-        /* Novo estilo para o botão "Editar" */
-        .editar-servico-btn {
-            padding: 8px 12px;
-            background-color: #008CBA;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            margin-left: 10px;
-            font-size: 0.9em;
-            cursor: pointer;
-            border: none;
-        }
+/* Botão "Editar Serviço" */
+.editar-servico-btn {
+  padding: 8px 12px;
+  background-color: #008CBA;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  margin-left: 10px;
+  font-size: 0.9em;
+  cursor: pointer;
+}
 
-        /* Estilos de erro */
-        .error-message {
-            color: red;
-            margin-top: 5px;
-        }
-        
-        .profile-picture {
-            width: 250px;
-            height: 250px;
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .profile-picture input[type="file"] {
-            display: none;
-        }
-        
-        .profile-picture label {
-            display: block;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-        
-        .profile-picture img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: opacity 0.3s ease;
-        }
-        
-        .profile-picture label:hover img {
-            opacity: 0.7;
-        }
-        
-        .camera-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 2em;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .profile-picture label:hover .camera-overlay {
-            opacity: 1;
-        }
-        
-        .picture-placeholder {
-            width: 100%;
-            height: 100%;
-            background-color: #ddd;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #888;
-        }
+/* Mensagem de erro */
+.error-message {
+  color: red;
+  margin-top: 5px;
+}
+
+/* Profile picture */
+.profile-picture {
+  width: 250px;
+  height: 250px;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.profile-picture input[type="file"] {
+  display: none;
+}
+
+.profile-picture label {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.profile-picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.3s ease;
+}
+
+.profile-picture label:hover img {
+  opacity: 0.7;
+}
+
+.camera-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 2em;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.profile-picture label:hover .camera-overlay {
+  opacity: 1;
+}
+
+.picture-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #888;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .content {
+    flex-direction: column;
+    align-items: center;
+  }
+  .info-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .info-label {
+    margin-bottom: 5px;
+    width: auto;
+  }
+}
+
         
         
     </style>
@@ -335,7 +353,7 @@
       </button>
 
       <!-- Botão Apagar -->
-      <button class="apagar-servico-btn" data-servico-id="{{ servico.id }}">
+      <button class="apagar-servico-btn" style="background-color: red; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;" data-servico-id="{{ servico.id }}">
         Apagar Serviço
       </button>
     </div>
@@ -428,8 +446,8 @@
         <div class="modal-content">
         </div>
     </div>
-
-    <script>
+    {% csrf_token %}
+<script>
     document.addEventListener('DOMContentLoaded', function () {
         // Modal Alterar Dados
         const alterarDadosBtn = document.getElementById('alterarDadosBtn');
@@ -473,6 +491,11 @@
         // Envio do formulário "Adicionar Serviço"
         adicionarServicoForm?.addEventListener('submit', function (event) {
             event.preventDefault();
+
+            // Remove erros anteriores
+            const previousError = document.querySelector('.error-message');
+            if (previousError) previousError.remove();
+
             const formData = new FormData(this);
 
             fetch("{% url 'adicionar_servico' %}", {
@@ -481,10 +504,24 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Resposta do servidor:', data);
                 if (data.success) {
                     location.reload();
                 } else {
+                    // Exibe erro abaixo do campo da foto
+                    const erroContainer = document.createElement('div');
+                    erroContainer.className = 'error-message';
+
+                    if (data.errors?.foto) {
+                        erroContainer.innerText = data.errors.foto.join(' ');
+                    } else {
+                        erroContainer.innerText = data.error || 'Erro ao adicionar serviço.';
+                    }
+
+                    const fotoInput = document.getElementById('id_foto');
+                    if (fotoInput && !document.querySelector('.error-message')) {
+                        fotoInput.parentNode.appendChild(erroContainer);
+                    }
+
                     console.error('Erro ao adicionar o serviço:', data.errors || data.error);
                 }
             })
@@ -556,8 +593,11 @@
                 const servicoId = this.getAttribute('data-servico-id');
                 if (confirm('Tem certeza de que deseja apagar este serviço?')) {
                     fetch(`/apagar_servico/${servicoId}/`, {
-                        method: 'DELETE',
-                        headers: { 'X-CSRFToken': getCookie('csrftoken') }
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
                     })
                     .then(response => response.json())
                     .then(data => {
@@ -611,7 +651,7 @@
             }
         });
 
-        // Função utilitária para obter o CSRF
+        // Função utilitária para obter o CSRF token
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -626,6 +666,8 @@
         }
     });
 </script>
+
+
 
 </body>
 </html>

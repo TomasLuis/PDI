@@ -512,8 +512,7 @@
                         </div>
                         <div class="card-footer bg-white">
                             <div class="rating-price justify-content-between align-items-center">
-                                {# Use os atributos anotados da view: servico.avg_avaliacao e servico.comment_count #}
-                                {# A classificação será None se não houver comentários, por isso verificamos por None #}
+                                {# A classificação está None se não houver comentários, por isso verificamos por None #}
                                 {% if servico.avg_avaliacao is not None and servico.avg_avaliacao > 0 %}
                                     <div class="rating">
                                        Classificação:  {{ servico.avg_avaliacao|stringformat:".1f" }} ★ ({{ servico.comment_count }})
@@ -566,7 +565,7 @@
                 <img src="{% static 'imagens/slogan.png' %}">
             </div>
             <div class="footer-links">
-                <a href='quem_somos'>Quem somos?</a>
+                <a href="/quem_somos/">Quem Somos</a>
                 <a href="{% url 'index:index' %}">Página inicial</a>
             </div>
             <div class="copyright">
@@ -596,7 +595,7 @@
                 }
             });
 
-            // Adicionando a lógica da pesquisa inteligente
+            // Pesquisa inteligente
             const searchInput = document.getElementById("search-input");
             const suggestionsBox = document.getElementById("suggestions");
             const searchForm = document.getElementById("search-form");

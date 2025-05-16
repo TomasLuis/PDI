@@ -1,6 +1,6 @@
 from django.db import models
-from django.conf import settings  # Para referenciar o utilizador ativo
-from perfil.models import Servico  # O teu modelo de serviço
+from django.conf import settings 
+from perfil.models import Servico 
 
 class Conversation(models.Model):
     participant1 = models.ForeignKey(
@@ -52,7 +52,7 @@ class Message(models.Model):
 
 class ConversationRead(models.Model):
     """
-    Guarda, para cada usuário e conversa, a última vez que esse usuário leu as mensagens.
+    Ultima vez que o utilizador leu a conversa
     """
     conversation = models.ForeignKey(
         Conversation,
