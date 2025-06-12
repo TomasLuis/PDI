@@ -263,13 +263,21 @@
 
 <body>
     <div class="perfil-container">
-        <header>
-            <nav class="navbar">
-                <div class="logo">
-                    <img src="{% static 'imagens/logo.png' %}" alt="SkillCraft">
-                </div>
-            </nav>
-        </header>
+        <header style="display: flex; align-items: center; justify-content: space-between; padding: 10px 20px;">
+  <button onclick="history.back()" style="background-color: transparent; border: none; font-size: 1.1rem; cursor: pointer;">
+    &#8592; Voltar
+  </button>
+
+  <div style="display: flex; align-items: center; justify-content: center; flex: 1;">
+    <div class="logo">
+      <img src="{% static 'imagens/logo.png' %}" alt="SkillCraft">
+    </div>
+  </div>
+
+  <nav>
+    <ul></ul>
+  </nav>
+</header>
         <div class="content">
             <div class="profile-picture">
                 <input type="file" id="fotoPerfilInput" accept="image/*">

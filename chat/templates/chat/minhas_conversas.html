@@ -81,13 +81,15 @@
 
   <!-- navbar -->
   <header>
-    <div class="logo">
-      <img src="{% static 'imagens/logo.png' %}" alt="SkillCraft">
+        <button onclick="history.back()" style="background-color: transparent; border: none; font-size: 1.1rem; cursor: pointer;">
+    &#8592; Voltar
+  </button>
+  <div style="display: flex; align-items: center; justify-content: center; flex: 1;">
+        <div class="logo">
+            <img src="{% static 'imagens/logo.png' %}" alt="SkillCraft">
+        </div>
     </div>
-    <nav>
-      <ul></ul>
-    </nav>
-  </header>
+    </header>
 
   <div class="container mt-4">
     {% if papel == "cliente" %}
@@ -99,57 +101,71 @@
     {% if conversas %}
       <ul class="list-group">
 
-        <!-- laço -->
-        {% for conversa in conversas %}
-          {% if conversa.participant1 == user %}
-            {% with other_user=conversa.participant2 %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                {% if papel == "cliente" %}Prestador de Serviço:{% else %}Cliente:{% endif %}
-                {% if other_user.perfil.nome %}
-                  {{ other_user.perfil.nome }}
-                {% else %}
-                  {{ other_user.username }}
-                {% endif %}
-
-                <a href="{% url 'chat:chat_room' conversa.id %}"
-                   class="btn btn-primary btn-sm position-relative open-chat-btn"
-                   onclick="this.querySelector('.badge')?.remove()">
-                  Abrir Chat
-                  {% if conversa.unread > 0 %}
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                      {{ conversa.unread }}
-                      <span class="visually-hidden">novas mensagens</span>
-                    </span>
-                  {% endif %}
-                </a>
-              </li>
-            {% endwith %}
+  <!-- laço -->
+  {% for conversa in conversas %}
+    {% if conversa.participant1 == user %}
+      {% with other_user=conversa.participant2 %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          {% if papel == "cliente" %}Prestador de Serviço:{% else %}Cliente:{% endif %}
+          {% if other_user.perfil.nome %}
+            {{ other_user.perfil.nome }}
           {% else %}
-            {% with other_user=conversa.participant1 %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                {% if papel == "cliente" %}Prestador de Serviço:{% else %}Cliente:{% endif %}
-                {% if other_user.perfil.nome %}
-                  {{ other_user.perfil.nome }}
-                {% else %}
-                  {{ other_user.username }}
-                {% endif %}
-
-                <a href="{% url 'chat:chat_room' conversa.id %}"
-                   class="btn btn-primary btn-sm position-relative open-chat-btn"
-                   onclick="this.querySelector('.badge')?.remove()">
-                  Abrir Chat
-                  {% if conversa.unread > 0 %}
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                      {{ conversa.unread }}
-                      <span class="visually-hidden">novas mensagens</span>
-                    </span>
-                  {% endif %}
-                </a>
-              </li>
-            {% endwith %}
+            {{ other_user.username }}
           {% endif %}
-        {% endfor %}
-      </ul>
+
+          <div class="d-flex align-items-center">
+            <a href="{% url 'chat:chat_room' conversa.id %}"
+               class="btn btn-primary btn-sm position-relative open-chat-btn me-2"
+               onclick="this.querySelector('.badge')?.remove()">
+              Abrir Chat
+              {% if conversa.unread > 0 %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  {{ conversa.unread }}
+                  <span class="visually-hidden">novas mensagens</span>
+                </span>
+              {% endif %}
+            </a>
+            <form method="post" action="{% url 'chat:apagar_conversa' conversa.id %}"
+                  onsubmit="return confirm('Tem a certeza que deseja apagar esta conversa?');">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm">Apagar</button>
+            </form>
+          </div>
+        </li>
+      {% endwith %}
+    {% else %}
+      {% with other_user=conversa.participant1 %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          {% if papel == "cliente" %}Prestador de Serviço:{% else %}Cliente:{% endif %}
+          {% if other_user.perfil.nome %}
+            {{ other_user.perfil.nome }}
+          {% else %}
+            {{ other_user.username }}
+          {% endif %}
+
+          <div class="d-flex align-items-center">
+            <a href="{% url 'chat:chat_room' conversa.id %}"
+               class="btn btn-primary btn-sm position-relative open-chat-btn me-2"
+               onclick="this.querySelector('.badge')?.remove()">
+              Abrir Chat
+              {% if conversa.unread > 0 %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  {{ conversa.unread }}
+                  <span class="visually-hidden">novas mensagens</span>
+                </span>
+              {% endif %}
+            </a>
+            <form method="post" action="{% url 'chat:apagar_conversa' conversa.id %}"
+                  onsubmit="return confirm('Tem a certeza que deseja apagar esta conversa?');">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm">Apagar</button>
+            </form>
+          </div>
+        </li>
+      {% endwith %}
+    {% endif %}
+  {% endfor %}
+</ul>
     {% else %}
       <p>Ainda não tens conversas iniciadas.</p>
     {% endif %}

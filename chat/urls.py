@@ -8,4 +8,6 @@ urlpatterns = [
     path('iniciar/<int:servico_id>/', views.iniciar_conversa, name='iniciar_conversa'),
     path('conversas/', views.chat_list, name='chat_list'),
     path('minhas-conversas/', views.minhas_conversas, name='minhas_conversas'),
+    path('apagar/<int:conversation_id>/', views.apagar_conversa, name='apagar_conversa'),
+
 ]

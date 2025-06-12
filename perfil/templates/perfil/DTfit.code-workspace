@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"name": "DTfit",
+			"path": "../../../../../../../xampp/htdocs/DTfit"
+		},
+		{
+			"name": "skillcraft",
+			"path": "../../.."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "Trabalho DWEB"
+	}
+}

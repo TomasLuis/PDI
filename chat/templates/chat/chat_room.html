@@ -83,10 +83,15 @@
 </head>
 <body>
 <header>
-    <div class="logo">
-        <img src="{% static 'imagens/logo.png' %}" alt="SkillCraft">
+        <button onclick="history.back()" style="background-color: transparent; border: none; font-size: 1.1rem; cursor: pointer;">
+    &#8592; Voltar
+  </button>
+  <div style="display: flex; align-items: center; justify-content: center; flex: 1;">
+        <div class="logo">
+            <img src="{% static 'imagens/logo.png' %}" alt="SkillCraft">
+        </div>
     </div>
-</header>
+    </header>
 
 <div class="container mt-4">
     <h2>Conversa com {{ other_name }}</h2>

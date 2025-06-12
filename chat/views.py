@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 
 from .models import Conversation, Message, ConversationRead
 from perfil.models import Servico
+from django.views.decorators.http import require_POST
 
 User = get_user_model()  # modelo user
 
@@ -144,3 +145,18 @@ def minhas_conversas(request):
         'papel': papel,
         'user': user,
     })
+
+
+@login_required
+@require_POST
+def apagar_conversa(request, conversation_id):
+    conversa = get_object_or_404(Conversation, id=conversation_id)
+
+    # Garantir que o utilizador faz parte da conversa
+    if request.user == conversa.participant1 or request.user == conversa.participant2:
+        conversa.delete()
+        messages.success(request, "Conversa apagada com sucesso.")
+    else:
+        messages.error(request, "Não tem permissão para apagar esta conversa.")
+
+    return redirect('chat:minhas_conversas')  # ou 'chat:chat_list' dependendo da rota
