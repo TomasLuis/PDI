@@ -26,10 +26,6 @@ header {
     align-items: center;
 }
 
-.logo img {
-    height: 50px;
-}
-
 .content {
     display: flex;
     justify-content: space-between;

@@ -18,9 +18,13 @@
 }
 
 .logo {
-    display: block;
-    margin: 0 auto;
-    height: 4rem;
+      margin: 0 auto;
+      height: 4rem;
+      position: relative;
+      top: 30px;
+      left: 0px;
+      transform: translate(-50%, -50%);
+      display: block;
 }
 
 /* Formulário */

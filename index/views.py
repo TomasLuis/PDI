@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from index.models import Especialista, Servico  # Importe o modelo Servico
+from index.models import  Servico  # Importe o modelo Servico
 from perfil.models import Servico, Comentario  # Importe o model Comentario do perfil
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse  # Importe HttpResponse
 from django.db.models import Q, Avg, Count
@@ -16,7 +16,7 @@ from django.db import models
 
 def index(request):
     top_servicos = Servico.objects.annotate(
-        avg_rating=Avg('classificacoes__classificacao')
+        avg_rating=Avg('comentarios__classificacao')
     ).order_by('-avg_rating')[:6]
 
     return render(request, 'index/index.html', {
