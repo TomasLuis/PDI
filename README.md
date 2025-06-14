@@ -16,7 +16,7 @@ Mac/Linux:
 python3 -m venv venv
 source venv/bin/activate
 
-3. Instalar as dependências quee stão no ficheiro "requirements.txt":
+3. Instalar as dependências que estão no ficheiro "requirements.txt":
 
 pip install -r requirements.txt
 
@@ -33,7 +33,7 @@ python manage.py runserver
 
 Passo 2: Iniciar o servidor WebSocket (para o chat)
 
-Numa outra shell copiar o código que está em baixp, com o mesmo ambiente virtual ativado:
+Numa outra shell copiar o código que está em baixo, com o mesmo ambiente virtual ativado:
 
 daphne -p 8001 skillcraft.asgi:application
 
