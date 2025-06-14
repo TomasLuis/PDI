@@ -414,17 +414,15 @@
     </style>
 </head>
 <body>
-
-
-
-    
     <header>
         <button onclick="history.back()" style="background-color: transparent; border: none; font-size: 1.1rem; cursor: pointer;position:absolute;left:80px;">
     &#8592; Voltar
   </button>
   <div style="display: flex; align-items: center; justify-content: center; flex: 1;">
         <div class="logo">
+            <a href="{% url 'index:index' %}">
             <img src="{% static 'imagens/logo.png' %}" alt="SkillCraft">
+            </a>
         </div>
     </div>
         <nav>

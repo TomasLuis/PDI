@@ -273,7 +273,9 @@
 
   <div style="display: flex; align-items: center; justify-content: center; flex: 1;">
     <div class="logo">
+        <a href="{% url 'index:index' %}">
       <img src="{% static 'imagens/logo.png' %}" alt="SkillCraft">
+        </a>
     </div>
   </div>
 
@@ -322,7 +324,9 @@
         {% if servicos %}
   {% for servico in servicos %}
     <div class="servico-item">
+        <a href="{% url 'index:detalhes_servico' servico.id %}">
       <img src="{{ servico.foto.url }}" alt="{{ servico.categoria }}">
+        </a>
       <div>
         <h3>{{ servico.categoria }}</h3>
         <p>Descrição: {{ servico.descricao }}</p>
