@@ -25,7 +25,7 @@ pip install -r requirements.txt
 python manage.py migrate
 
 
-4. Como executar o projeto
+4. Como executar o projeto:
 
 Passo 1: Iniciar o servidor HTTP
 
