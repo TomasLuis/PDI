@@ -6,7 +6,7 @@ Requisitos
 - Git (para clonar o repositório)
 - Ambiente virtual (recomendado)
 
-2. Criar e ativar o ambiente virtual:
+1. Criar e ativar o ambiente virtual:
 
 Windows:
 python -m venv venv
@@ -16,11 +16,11 @@ Mac/Linux:
 python3 -m venv venv
 source venv/bin/activate
 
-3. Instalar as dependências que estão no ficheiro "requirements.txt":
+2. Instalar as dependências que estão no ficheiro "requirements.txt":
 
 pip install -r requirements.txt
 
-4. Aplicar as migrações da base de dados:
+3. Aplicar as migrações da base de dados:
 
 python manage.py migrate
 
